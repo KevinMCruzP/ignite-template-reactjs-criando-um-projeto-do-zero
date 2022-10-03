@@ -1,0 +1,6 @@
+{
+  "apiEndpoint": "https://criando-projeto-do-zeroo.prismic.io/api/v2",
+  "libraries": [
+    "@/slices"
+  ]
+}
