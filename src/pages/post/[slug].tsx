@@ -50,14 +50,9 @@ interface PostProps {
       };
     }[];
   };
-  preview: boolean;
 }
 
-export default function Post({
-  post,
-  navigation,
-  preview,
-}: PostProps): JSX.Element {
+export default function Post({ post, navigation }: PostProps): JSX.Element {
   const router = useRouter();
   if (router.isFallback) {
     return <h1>Carregando...</h1>;
@@ -79,20 +74,6 @@ export default function Post({
       locale: ptBR,
     }
   );
-
-  const isPostEdited =
-    post.first_publication_date !== post.last_publication_date;
-
-  let editionDate;
-  if (isPostEdited) {
-    editionDate = format(
-      new Date(post.last_publication_date),
-      "'* editado em' dd MMM yyyy', às' H':'m",
-      {
-        locale: ptBR,
-      }
-    );
-  }
 
   return (
     <>
@@ -116,7 +97,7 @@ export default function Post({
                 {`${readTime} min`}
               </li>
             </ul>
-            <span>{isPostEdited && editionDate}</span>
+            {/* <span>{isPostEdited && editionDate}</span> */}
           </div>
 
           {post.data.content.map(content => {
@@ -153,14 +134,6 @@ export default function Post({
             </div>
           )}
         </section>
-
-        {preview && (
-          <aside>
-            <Link href="/api/exit-preview">
-              <a className={commonStyles.preview}>Sair do modo Preview</a>
-            </Link>
-          </aside>
-        )}
       </main>
     </>
   );
@@ -168,8 +141,9 @@ export default function Post({
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const prismic = getPrismicClient();
+
   const posts = await prismic.query([
-    Prismic.Predicates.at('document.type', 'posts'),
+    Prismic.Predicates.at('document.type', 'post'),
   ]);
 
   const paths = posts.results.map(post => {
@@ -188,7 +162,6 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async ({
   params,
-  preview = false,
   previewData,
 }) => {
   const prismic = getPrismicClient();
@@ -196,8 +169,6 @@ export const getStaticProps: GetStaticProps = async ({
   const response = await prismic.getByUID('post', String(slug), {
     ref: previewData?.ref || null,
   });
-
-  console.log(response);
 
   const prevPost = await prismic.query(
     [Prismic.Predicates.at('document.type', 'post')],
@@ -244,7 +215,6 @@ export const getStaticProps: GetStaticProps = async ({
         prevPost: prevPost?.results,
         nextPost: nextPost?.results,
       },
-      preview,
     },
     revalidate: 1800,
   };

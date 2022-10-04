@@ -29,13 +29,9 @@ interface PostPagination {
 
 interface HomeProps {
   postsPagination: PostPagination;
-  preview: boolean;
 }
 
-export default function Home({
-  postsPagination,
-  preview,
-}: HomeProps): ReactElement {
+export default function Home({ postsPagination }: HomeProps): ReactElement {
   const formattedPost = postsPagination.results?.map(post => {
     return {
       ...post,
@@ -87,7 +83,7 @@ export default function Home({
   return (
     <>
       <Head>
-        <title>Home | spacetraveling</title>
+        <title>Home | SpaceTraveling</title>
       </Head>
 
       <main className={commonStyles.container}>
@@ -119,26 +115,18 @@ export default function Home({
             </button>
           )}
         </div>
-
-        {preview && (
-          <aside>
-            <Link href="/api/exit-preview">
-              <a className={commonStyles.preview}>Sair do modo Preview</a>
-            </Link>
-          </aside>
-        )}
       </main>
     </>
   );
 }
 
-export const getStaticProps: GetStaticProps = async ({ preview = false }) => {
+export const getStaticProps: GetStaticProps = async () => {
   const prismic = getPrismicClient();
 
   const postsResponse = await prismic.query(
     [Prismic.Predicates.at('document.type', 'post')],
     {
-      pageSize: 2,
+      pageSize: 3,
       orderings: '[document.last_publication_date desc]',
     }
   );
@@ -163,7 +151,6 @@ export const getStaticProps: GetStaticProps = async ({ preview = false }) => {
   return {
     props: {
       postsPagination,
-      preview,
     },
     revalidate: 1800,
   };
