@@ -36,7 +36,7 @@ export default function Home({
   postsPagination,
   preview,
 }: HomeProps): ReactElement {
-  const formattedPost = postsPagination.results.map(post => {
+  const formattedPost = postsPagination.results?.map(post => {
     return {
       ...post,
       first_publication_date: format(
@@ -52,7 +52,6 @@ export default function Home({
   const [posts, setPosts] = useState<Post[]>(formattedPost);
   const [nextPage, setNextPage] = useState(postsPagination.next_page);
   const [currentPage, setCurrentPage] = useState(1);
-
   async function handleNextPage(): Promise<void> {
     if (currentPage !== 1 && nextPage === null) {
       return;
@@ -137,9 +136,9 @@ export const getStaticProps: GetStaticProps = async ({ preview = false }) => {
   const prismic = getPrismicClient();
 
   const postsResponse = await prismic.query(
-    [Prismic.Predicates.at('document.type', 'posts')],
+    [Prismic.Predicates.at('document.type', 'post')],
     {
-      pageSize: 3,
+      pageSize: 2,
       orderings: '[document.last_publication_date desc]',
     }
   );
